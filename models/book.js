@@ -17,6 +17,10 @@ var BookSchema = new Schema({
   publisher: {
     type: String,
     required: true
+  },
+  photo: {
+    type: String,
+    required: true
   }
 });
 

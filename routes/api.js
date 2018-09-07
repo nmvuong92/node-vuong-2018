@@ -51,6 +51,7 @@ router.post('/signin', function(req, res) {
 });
 
 router.post('/book', passport.authenticate('jwt', { session: false}), function(req, res) {
+ 
   var token = getToken(req.headers);
   if (token) {
     console.log(req.body);
@@ -58,7 +59,8 @@ router.post('/book', passport.authenticate('jwt', { session: false}), function(r
       isbn: req.body.isbn,
       title: req.body.title,
       author: req.body.author,
-      publisher: req.body.publisher
+      publisher: req.body.publisher,
+      photo: req.body.photo,
     });
 
     newBook.save(function(err) {
@@ -82,6 +84,65 @@ router.get('/book', passport.authenticate('jwt', { session: false}), function(re
   } else {
     return res.status(403).send({success: false, msg: 'Unauthorized.'});
   }
+});
+
+router.delete('/book/:bookId', passport.authenticate('jwt', { session: false}), function(req, res) {
+  var token = getToken(req.headers);
+  if (token) {
+    Book.findByIdAndRemove(req.params.bookId).then(book => {
+      if(!book) {
+          return res.status(404).send({
+              message: "book not found with id " + req.params.bookId
+          });
+      }
+      res.send({message: "book deleted successfully!"});
+    }).catch(err => {
+        if(err.kind === 'ObjectId' || err.name === 'NotFound') {
+            return res.status(404).send({
+                message: "book not found with id " + req.params.bookId
+            });                
+        }
+        return res.status(500).send({
+            message: "Could not delete book with id " + req.params.bookId
+        });
+    });
+  } else {
+    return res.status(403).send({success: false, msg: 'Unauthorized.'});
+  }
+});
+router.put('/book/:bookId', passport.authenticate('jwt', { session: false}), function(req, res) {
+  var token = getToken(req.headers);
+  if (token) {  
+    // Find book and update it with the request body
+    Book.findByIdAndUpdate(req.params.bookId, {
+      isbn: req.body.isbn|| "Untitled isbn",
+      title: req.body.title|| "Untitled title",
+      author: req.body.author|| "Untitled author",
+      publisher: req.body.publisher|| "Untitled publisher",
+      photo: req.body.photo|| "https://via.placeholder.com/150X150",
+    }, {new: true})
+    .then(book => {
+        if(!book) {
+            return res.status(404).send({
+                message: "book not found with id " + req.params.bookId
+            });
+        }
+        res.send(book);
+    }).catch(err => {
+        if(err.kind === 'ObjectId') {
+            return res.status(404).send({
+                message: "book not found with id " + req.params.bookId
+            });                
+        }
+        return res.status(500).send({
+            message: "Error updating book with id " + req.params.bookId
+        });
+    });
+   
+  } else {
+    return res.status(403).send({success: false, msg: 'Unauthorized.'});
+  }
+
 });
 
 getToken = function (headers) {

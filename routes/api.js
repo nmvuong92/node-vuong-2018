@@ -27,6 +27,7 @@ router.post('/signup', function(req, res) {
 });
 
 router.post('/signin', function(req, res) {
+  console.log("signin");
   User.findOne({
     username: req.body.username
   }, function(err, user) {

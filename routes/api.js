@@ -51,6 +51,8 @@ router.post('/signin', function(req, res) {
   });
 });
 
+
+/*THÊM 1 QUYỂN SÁCH*/
 router.post('/book', passport.authenticate('jwt', { session: false}), function(req, res) {
  
   var token = getToken(req.headers);
@@ -75,6 +77,7 @@ router.post('/book', passport.authenticate('jwt', { session: false}), function(r
   }
 });
 
+/*LẤY 1 QUYỂN SÁCH*/ 
 router.get('/book', passport.authenticate('jwt', { session: false}), function(req, res) {
   var token = getToken(req.headers);
   if (token) {
@@ -87,6 +90,7 @@ router.get('/book', passport.authenticate('jwt', { session: false}), function(re
   }
 });
 
+/*XÓA 1 QUYỂN SÁCH*/
 router.delete('/book/:bookId', passport.authenticate('jwt', { session: false}), function(req, res) {
   var token = getToken(req.headers);
   if (token) {
@@ -111,6 +115,8 @@ router.delete('/book/:bookId', passport.authenticate('jwt', { session: false}), 
     return res.status(403).send({success: false, msg: 'Unauthorized.'});
   }
 });
+
+/*CẬP NHẬT MỘT QUYỂN SÁCH*/
 router.put('/book/:bookId', passport.authenticate('jwt', { session: false}), function(req, res) {
   var token = getToken(req.headers);
   if (token) {  
